@@ -97,8 +97,12 @@ class App extends Component {
             roomId={this.state.roomId}
             rooms={[...this.state.joinableRooms, ...this.state.joinedRooms]}
             subscribeToRoom={this.subscribeToRoom} />
-        <MessageList messages={this.state.messages}/>
-        <SendMessageForm sendMessage={this.sendMessage}/>
+        <MessageList
+            roomId={this.state.roomId}
+            messages={this.state.messages}/>
+        <SendMessageForm
+            disable={!this.state.roomId}
+            sendMessage={this.sendMessage}/>
         <NewRoomForm createRoom={this.createRoom} />
       </div>
     );

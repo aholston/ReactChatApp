@@ -26,6 +26,7 @@ class SendMessageForm extends React.Component {
         return (
             <form onSubmit={this.handleSubmit.bind(this)} className='send-message-form'>
                 <input
+                    disabled={this.props.disabled}
                     onChange={this.handleChange.bind(this)}
                     value={this.state.message}
                     placeholder='Type your message and hit ENTER'
