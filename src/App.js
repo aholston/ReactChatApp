@@ -10,16 +10,41 @@ import { tokenUrl, instanceLocator } from './config';
 
 class App extends Component {
 
+    constructor() {
+        super();
+        this.state = {
+            messages: []
+        }
+    }
+
     componentDidMount() {
         const chatManager = new ChatKit.ChatManager({
-            instanceLocator
+            instanceLocator,
+            userId: 'andre',
+            tokenProvider: new ChatKit.TokenProvider({
+                url: tokenUrl
+            })
         });
+
+        chatManager.connect()
+            .then(currentUser => {
+                currentUser.subscribeToRoom({
+                    roomId: '19668054',
+                    hooks: {
+                        onMessage: message => {
+                            this.setState({
+                                messages: [...this.state.messages, message]
+                            })
+                        }
+                    }
+                })
+            })
     }
   render() {
     return (
       <div className="App">
 
-        <MessageList />
+        <MessageList messages={this.state.messages}/>
 
       </div>
     );
