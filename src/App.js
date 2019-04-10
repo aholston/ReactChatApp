@@ -3,8 +3,8 @@ import ChatKit from '@pusher/chatkit-client';
 import MessageList from './components/MessageList';
 import SendMessageForm from './components/SendMessageForm';
 import RoomList from './components/RoomList';
-// import NewRoomForm from './components/NewRoomForm';
-import './App.css';
+import NewRoomForm from './components/NewRoomForm';
+
 
 import { tokenUrl, instanceLocator } from './config';
 
@@ -22,6 +22,7 @@ class App extends Component {
         this.sendMessage = this.sendMessage.bind(this);
         this.subscribeToRoom = this.subscribeToRoom.bind(this);
         this.getRooms = this.getRooms.bind(this);
+        this.createRoom = this.createRoom.bind(this);
     }
 
     componentDidMount() {
@@ -81,6 +82,14 @@ class App extends Component {
             roomId: this.state.roomId
         })
     }
+
+    createRoom(name) {
+        this.currentUser.createRoom({
+            name
+        })
+        .then(room => this.subscribeToRoom(room.id))
+    }
+
   render() {
     return (
       <div className="App">
@@ -90,6 +99,7 @@ class App extends Component {
             subscribeToRoom={this.subscribeToRoom} />
         <MessageList messages={this.state.messages}/>
         <SendMessageForm sendMessage={this.sendMessage}/>
+        <NewRoomForm createRoom={this.createRoom} />
       </div>
     );
   }
