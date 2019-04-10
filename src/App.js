@@ -15,10 +15,13 @@ class App extends Component {
         this.state = {
             messages: [],
             joinableRooms: [],
-            joinedRooms: []
+            joinedRooms: [],
+            roomId: null
         }
 
         this.sendMessage = this.sendMessage.bind(this);
+        this.subscribeToRoom = this.subscribeToRoom.bind(this);
+        this.getRooms = this.getRooms.bind(this);
     }
 
     componentDidMount() {
@@ -33,45 +36,59 @@ class App extends Component {
         chatManager.connect()
             .then(currentUser => {
                 this.currentUser = currentUser;
-
-                this.currentUser.getJoinableRooms()
-                    .then(joinableRooms => {
-                        this.setState({
-                            joinableRooms,
-                            joinedRooms: this.currentUser.rooms
-                        })
-                    })
-                    .catch(err => console.log('errors on joinableRooms: ', err))
-
-                currentUser.subscribeToRoom({
-                    roomId: '19668054',
-                    hooks: {
-                        onMessage: message => {
-                            this.setState({
-                                messages: [...this.state.messages, message]
-                            })
-                        }
-                    }
-                })
+                this.getRooms();
             })
             .catch(err => console.log('errors on connecting: ', err))
     }
 
-    sendMessage(text) {
+    subscribeToRoom(roomId) {
+        this.setState({
+            messages: []
+        })
+        this.currentUser.subscribeToRoom({
+            roomId: roomId,
+            hooks: {
+                onMessage: message => {
+                    this.setState({
+                        messages: [...this.state.messages, message]
+                    })
+                }
+            }
+        })
+        .then(room => {
+            this.setState({
+                roomId: room.id
+            })
+            this.getRooms();
+        })
+        .catch(err => console.log('error on subscribing to room: ', err))
+    }
+
+    getRooms() {
+        this.currentUser.getJoinableRooms()
+            .then(joinableRooms => {
+                this.setState({
+                    joinableRooms,
+                    joinedRooms: this.currentUser.rooms
+                })
+            })
+            .catch(err => console.log('errors on joinableRooms: ', err))
+    }
+
+    sendMessage(text, roomId) {
         this.currentUser.sendMessage({
             text,
-            roomId: '19668054'
+            roomId: this.state.roomId
         })
     }
   render() {
     return (
       <div className="App">
-
-        <RoomList rooms={[...this.state.joinableRooms, ...this.state.joinedRooms]}/>
+        <RoomList
+            rooms={[...this.state.joinableRooms, ...this.state.joinedRooms]}
+            subscribeToRoom={this.subscribeToRoom} />
         <MessageList messages={this.state.messages}/>
         <SendMessageForm sendMessage={this.sendMessage}/>
-
-
       </div>
     );
   }

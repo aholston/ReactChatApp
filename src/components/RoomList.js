@@ -2,7 +2,6 @@ import React from 'react';
 
 class RoomList extends React.Component {
     render() {
-        console.log(this.props.rooms)
         return (
             <div className='rooms-list'>
                 <div className='help-text'>Room List</div>
@@ -11,7 +10,10 @@ class RoomList extends React.Component {
                     {this.props.rooms.map(room => {
                         return (
                             <li key={room.id} className='room'>
-                                <a href=""># {room.name}</a>
+                                <a
+                                    href="#"
+                                    onClick={() => this.props.subscribeToRoom(room.id)}># {room.name}
+                                </a>
                             </li>
                         )
                     })}
